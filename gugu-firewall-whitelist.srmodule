@@ -1,5 +1,5 @@
 #!name=咕咕云 防火墙自动加白
-#!desc=安装后：配置 → 模块 → 长按本模块 → 编辑纯文本，把两处 tokens= 后的占位换成你的 ctecsfw_ token，home= 后填家里 Wi-Fi 名（SSID）。家里 Wi-Fi 自动占槽 0、蜂窝占槽 1、其他 Wi-Fi 占槽 2，互不覆盖。
+#!desc=安装后：配置 → 模块 → 长按本模块 → 编辑纯文本，把两处 tokens= 后的占位换成你的 ctecsfw_ token，Wi-Fi 自动占槽 0、蜂窝占槽 1，互不覆盖（可选加 &home=家里WiFi名 区分家里和其他 Wi-Fi，需要定位权限）。
 #!author=Nellstar
 
 [Rule]
@@ -8,5 +8,5 @@ DOMAIN,www.guguyun.com,DIRECT
 IP-CIDR,69.165.68.160/32,DIRECT,no-resolve
 
 [Script]
-gugu-fw-cron = type=cron,cronexpr="*/10 * * * *",script-path=https://raw.githubusercontent.com/zhuoyi0918/gugufw/main/scripts/gugu-firewall-whitelist.js,timeout=60,argument=tokens=在此填入ctecsfw_token&home=在此填入家里WiFi名
-gugu-fw-event = type=event,event-name=network-changed,script-path=https://raw.githubusercontent.com/zhuoyi0918/gugufw/main/scripts/gugu-firewall-whitelist.js,timeout=60,argument=tokens=在此填入ctecsfw_token&home=在此填入家里WiFi名
+gugu-fw-cron = type=cron,cronexpr="*/10 * * * *",script-path=https://github.com/zhuoyi0918/gugufw/releases/download/V1.1.1/gugu-firewall-whitelist.js,timeout=60,argument=tokens=在此填入ctecsfw_token
+gugu-fw-event = type=event,event-name=network-changed,script-path=https://github.com/zhuoyi0918/gugufw/releases/download/V1.1.1/gugu-firewall-whitelist.js,timeout=60,argument=tokens=在此填入ctecsfw_token
