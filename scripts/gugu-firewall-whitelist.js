@@ -28,6 +28,7 @@
  */
 
 var INLINE_TOKENS = "";
+var VERSION = "1.1.1";
 
 var API = "https://www.guguyun.com/cany_tencentecs/firewall/whitelist?token=";
 var TOKEN_PREFIX = "ctecsfw_";
@@ -148,9 +149,10 @@ function detectNet() {
     if (typeof $network !== "undefined" && $network) {          // Surge / Shadowrocket / Stash
       var ssid = ($network.wifi && $network.wifi.ssid) || "";
       var iface = String(($network.v4 && $network.v4.primaryInterface) || "");
-      if (ssid) return { type: "wifi", ssid: ssid };
-      if ($network["cellular-data"] || /^pdp_ip/.test(iface)) return { type: "cell", ssid: "" };
-      if (/^en/.test(iface)) return { type: "wifi", ssid: "" };   // Wi-Fi 但拿不到 SSID（未授权定位等）
+      r.iface = iface;
+      if (ssid) return { type: "wifi", ssid: ssid, iface: iface };
+      if ($network["cellular-data"] || /^pdp_ip/.test(iface)) return { type: "cell", ssid: "", iface: iface };
+      if (/^en/.test(iface)) return { type: "wifi", ssid: "", iface: iface };   // Wi-Fi 但拿不到 SSID（未授权定位等）
     }
     if (typeof $config !== "undefined" && $config.getConfig) {   // Loon
       var c = JSON.parse($config.getConfig());
@@ -182,7 +184,8 @@ function pickSlot() {
     if (NET.ssid && HOMES.indexOf(NET.ssid) >= 0) return { slot: homeSlot, why: "家里 " + NET.ssid };
     return { slot: argInt("wifi_slot", 2), why: "其他 Wi-Fi" + (NET.ssid ? " " + NET.ssid : "") };
   }
-  return { slot: null, why: "无法识别网络" };
+  // 识别不了网络时按蜂窝处理：FIFO 只给 /32，手机上没法用
+  return { slot: argInt("cell_slot", 1), why: "未识别网络→按蜂窝" + (NET.iface ? "(" + NET.iface + ")" : "") };
 }
 var PICK = pickSlot();
 
@@ -285,7 +288,7 @@ if (!tokens.length) {
     });
     var ok = rs.filter(function (r) { return r.ok; }).length;
     var cidr = (rs.filter(function (r) { return r.cidr; })[0] || {}).cidr || "?";
-    var title = "咕咕云加白 " + ok + "/" + rs.length + " · " + cidr + " · " + PICK.why;
+    var title = "咕咕云加白 v" + VERSION + " " + ok + "/" + rs.length + " · " + cidr + " · " + PICK.why;
     var content = rs.map(line).join("\n");
     var changed = false;
     rs.forEach(function (r) {
